@@ -25,6 +25,7 @@ public class Options {
     private int scid = -1; // 31-bit non-negative value, or -1
     private boolean video = true;
     private boolean audio = true;
+    private boolean sizeInfo = true;
     private int maxSize;
     private VideoCodec videoCodec = VideoCodec.H264;
     private AudioCodec audioCodec = AudioCodec.OPUS;
@@ -96,6 +97,9 @@ public class Options {
 
     public int getMaxSize() {
         return maxSize;
+    }
+    public boolean getSizeInfo() {
+        return sizeInfo;
     }
 
     public VideoCodec getVideoCodec() {
@@ -320,6 +324,9 @@ public class Options {
                     break;
                 case "audio":
                     options.audio = Boolean.parseBoolean(value);
+                    break;
+                case "size_info":
+                    options.sizeInfo = Boolean.parseBoolean(value);
                     break;
                 case "video_codec":
                     VideoCodec videoCodec = VideoCodec.findByName(value);
