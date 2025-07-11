@@ -129,7 +129,7 @@ Here are just some common examples.
     scrcpy --otg
     ```
 
- - Control the device using gamepad controllers plugged into the computer:
+ - Control the device using gamepads plugged into the computer:
 
     ```bash
     scrcpy --gamepad=uhid
