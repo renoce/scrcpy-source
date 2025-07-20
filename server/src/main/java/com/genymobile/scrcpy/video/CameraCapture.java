@@ -54,6 +54,8 @@ public class CameraCapture extends SurfaceCapture {
             0, 1, 0, 1, // column 4
     };
 
+    private static final float ZOOM_FACTOR = 1 + 1 / 16f;
+
     private final String explicitCameraId;
     private final CameraFacing cameraFacing;
     private final Size explicitSize;
@@ -470,6 +472,37 @@ public class CameraCapture extends SurfaceCapture {
                 }
             }
         });
+    }
+
+    @TargetApi(AndroidVersions.API_30_ANDROID_11)
+    private void zoom(boolean in) {
+        cameraHandler.post(() -> {
+            assertCameraThread();
+            if (currentSession != null && requestBuilder != null) {
+                // Always align to log values
+                double z = Math.round(Math.log(zoom) / Math.log(ZOOM_FACTOR));
+                double dir = in ? 1 : -1;
+                zoom = (float) Math.pow(ZOOM_FACTOR, z + dir);
+
+                try {
+                    zoom = clampZoom(zoom);
+                    Ln.i("Set camera zoom: " + zoom);
+                    requestBuilder.set(CaptureRequest.CONTROL_ZOOM_RATIO, zoom);
+                    CaptureRequest request = requestBuilder.build();
+                    setRepeatingRequest(currentSession, request);
+                } catch (CameraAccessException e) {
+                    Ln.e("Camera error", e);
+                }
+            }
+        });
+    }
+
+    public void zoomIn() {
+        zoom(true);
+    }
+
+    public void zoomOut() {
+        zoom(false);
     }
 
     private float clampZoom(float value) {

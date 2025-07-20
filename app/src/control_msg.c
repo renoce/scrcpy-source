@@ -191,6 +191,8 @@ sc_control_msg_serialize(const struct sc_control_msg *msg, uint8_t *buf) {
         case SC_CONTROL_MSG_TYPE_ROTATE_DEVICE:
         case SC_CONTROL_MSG_TYPE_OPEN_HARD_KEYBOARD_SETTINGS:
         case SC_CONTROL_MSG_TYPE_RESET_VIDEO:
+        case SC_CONTROL_MSG_TYPE_CAMERA_ZOOM_IN:
+        case SC_CONTROL_MSG_TYPE_CAMERA_ZOOM_OUT:
             // no additional data
             return 1;
         default:
@@ -324,6 +326,12 @@ sc_control_msg_log(const struct sc_control_msg *msg) {
         case SC_CONTROL_MSG_TYPE_CAMERA_SET_TORCH:
             LOG_CMSG("camera set torch %s",
                      msg->camera_set_torch.on ? "on" : "off");
+            break;
+        case SC_CONTROL_MSG_TYPE_CAMERA_ZOOM_IN:
+            LOG_CMSG("camera zoom in");
+            break;
+        case SC_CONTROL_MSG_TYPE_CAMERA_ZOOM_OUT:
+            LOG_CMSG("camera zoom out");
             break;
         default:
             LOG_CMSG("unknown type: %u", (unsigned) msg->type);

@@ -316,6 +316,30 @@ camera_set_torch(struct sc_input_manager *im, bool on) {
 }
 
 static void
+camera_zoom_in(struct sc_input_manager *im) {
+    assert(im->controller && im->camera);
+
+    struct sc_control_msg msg;
+    msg.type = SC_CONTROL_MSG_TYPE_CAMERA_ZOOM_IN;
+
+    if (!sc_controller_push_msg(im->controller, &msg)) {
+        LOGW("Could not request camera zoom in");
+    }
+}
+
+static void
+camera_zoom_out(struct sc_input_manager *im) {
+    assert(im->controller && im->camera);
+
+    struct sc_control_msg msg;
+    msg.type = SC_CONTROL_MSG_TYPE_CAMERA_ZOOM_OUT;
+
+    if (!sc_controller_push_msg(im->controller, &msg)) {
+        LOGW("Could not request camera zoom out");
+    }
+}
+
+static void
 apply_orientation_transform(struct sc_input_manager *im,
                             enum sc_orientation transform) {
     struct sc_screen *screen = im->screen;
@@ -599,6 +623,18 @@ sc_input_manager_process_key(struct sc_input_manager *im,
                 case SDLK_T:
                     if (!repeat && down) {
                         camera_set_torch(im, !shift);
+                    }
+                    return;
+                case SDLK_DOWN:
+                    if (!shift && down && !paused) {
+                        // forward repeated events
+                        camera_zoom_out(im);
+                    }
+                    return;
+                case SDLK_UP:
+                    if (!shift && down && !paused) {
+                        // forward repeated events
+                        camera_zoom_in(im);
                     }
                     return;
             }

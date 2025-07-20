@@ -26,6 +26,8 @@ public final class ControlMessage {
     public static final int TYPE_START_APP = 16;
     public static final int TYPE_RESET_VIDEO = 17;
     public static final int TYPE_CAMERA_SET_TORCH = 18;
+    public static final int TYPE_CAMERA_ZOOM_IN = 19;
+    public static final int TYPE_CAMERA_ZOOM_OUT = 20;
 
     public static final long SEQUENCE_INVALID = 0;
 

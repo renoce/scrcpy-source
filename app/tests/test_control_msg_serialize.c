@@ -465,6 +465,36 @@ static void test_serialize_camera_set_torch(void) {
     assert(!memcmp(buf, expected, sizeof(expected)));
 }
 
+static void test_serialize_camera_zoom_in(void) {
+    struct sc_control_msg msg = {
+        .type = SC_CONTROL_MSG_TYPE_CAMERA_ZOOM_IN,
+    };
+
+    uint8_t buf[SC_CONTROL_MSG_MAX_SIZE];
+    size_t size = sc_control_msg_serialize(&msg, buf);
+    assert(size == 1);
+
+    const uint8_t expected[] = {
+        SC_CONTROL_MSG_TYPE_CAMERA_ZOOM_IN,
+    };
+    assert(!memcmp(buf, expected, sizeof(expected)));
+}
+
+static void test_serialize_camera_zoom_out(void) {
+    struct sc_control_msg msg = {
+        .type = SC_CONTROL_MSG_TYPE_CAMERA_ZOOM_OUT,
+    };
+
+    uint8_t buf[SC_CONTROL_MSG_MAX_SIZE];
+    size_t size = sc_control_msg_serialize(&msg, buf);
+    assert(size == 1);
+
+    const uint8_t expected[] = {
+        SC_CONTROL_MSG_TYPE_CAMERA_ZOOM_OUT,
+    };
+    assert(!memcmp(buf, expected, sizeof(expected)));
+}
+
 int main(int argc, char *argv[]) {
     (void) argc;
     (void) argv;
@@ -490,5 +520,7 @@ int main(int argc, char *argv[]) {
     test_serialize_start_app();
     test_serialize_reset_video();
     test_serialize_camera_set_torch();
+    test_serialize_camera_zoom_in();
+    test_serialize_camera_zoom_out();
     return 0;
 }

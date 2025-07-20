@@ -1228,6 +1228,14 @@ static const struct sc_shortcut shortcuts[] = {
         .shortcuts = { "MOD+Shift+t" },
         .text = "Turn off the camera torch (camera mode only)",
     },
+    {
+        .shortcuts = { "MOD+Up" },
+        .text = "Zoom camera in (camera mode only)",
+    },
+    {
+        .shortcuts = { "MOD+Down" },
+        .text = "Zoom camera out (camera mode only)",
+    },
 };
 
 static const struct sc_envvar envvars[] = {

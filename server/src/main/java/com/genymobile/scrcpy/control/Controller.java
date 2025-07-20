@@ -376,6 +376,12 @@ public class Controller implements AsyncProcessor, VirtualDisplayListener {
                 case ControlMessage.TYPE_CAMERA_SET_TORCH:
                     cameraCapture.setTorchEnabled(msg.getOn());
                     return true;
+                case ControlMessage.TYPE_CAMERA_ZOOM_IN:
+                    cameraCapture.zoomIn();
+                    return true;
+                case ControlMessage.TYPE_CAMERA_ZOOM_OUT:
+                    cameraCapture.zoomOut();
+                    return true;
                 default:
                     // fall through
             }
