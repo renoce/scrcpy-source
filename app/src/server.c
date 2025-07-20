@@ -360,6 +360,10 @@ execute_server(struct sc_server *server,
     if (params->camera_torch) {
         ADD_PARAM("camera_torch=true");
     }
+    if (params->camera_zoom) {
+        VALIDATE_STRING(params->camera_zoom);
+        ADD_PARAM("camera_zoom=%s", params->camera_zoom);
+    }
     if (params->show_touches) {
         ADD_PARAM("show_touches=true");
     }

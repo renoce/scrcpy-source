@@ -44,6 +44,7 @@ public class Options {
     private Size cameraSize;
     private CameraFacing cameraFacing;
     private CameraAspectRatio cameraAspectRatio;
+    private float cameraZoom = 1;
     private int cameraFps;
     private boolean cameraHighSpeed;
     private boolean cameraTorch;
@@ -167,6 +168,10 @@ public class Options {
 
     public CameraAspectRatio getCameraAspectRatio() {
         return cameraAspectRatio;
+    }
+
+    public float getCameraZoom() {
+        return cameraZoom;
     }
 
     public int getCameraFps() {
@@ -472,6 +477,11 @@ public class Options {
                 case "camera_ar":
                     if (!value.isEmpty()) {
                         options.cameraAspectRatio = parseCameraAspectRatio(value);
+                    }
+                    break;
+                case "camera_zoom":
+                    if (!value.isEmpty()) {
+                        options.cameraZoom = Float.parseFloat(value);
                     }
                     break;
                 case "camera_fps":

@@ -470,6 +470,7 @@ scrcpy(struct scrcpy_options *options) {
         .kill_adb_on_close = options->kill_adb_on_close,
         .camera_high_speed = options->camera_high_speed,
         .camera_torch = options->camera_torch,
+        .camera_zoom = options->camera_zoom,
         .vd_destroy_content = options->vd_destroy_content,
         .vd_system_decorations = options->vd_system_decorations,
         .list = options->list,

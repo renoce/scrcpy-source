@@ -26,6 +26,7 @@ arguments=(
     '--camera-fps=[Specify the camera capture frame rate]'
     '--camera-size=[Specify an explicit camera capture size]'
     '--camera-torch[Turn on the camera torch when the camera starts]'
+    '--camera-zoom[Specify the camera zoom initial value]'
     '--capture-orientation=[Set the capture video orientation]:orientation:(0 90 180 270 flip0 flip90 flip180 flip270 @0 @90 @180 @270 @flip0 @flip90 @flip180 @flip270)'
     '--crop=[\[width\:height\:x\:y\] Crop the device screen on the server]'
     {-d,--select-usb}'[Use USB device]'

@@ -65,10 +65,12 @@ public class CameraCapture extends SurfaceCapture {
     private final Orientation captureOrientation;
     private final float angle;
     private final boolean initialTorch;
+    private float zoom;
 
     private String cameraId;
     private Size captureSize;
     private Size videoSize; // after OpenGL transforms
+    private Range<Float> zoomRange;
 
     private AffineMatrix transform;
     private OpenGLRunner glRunner;
@@ -98,6 +100,7 @@ public class CameraCapture extends SurfaceCapture {
         assert captureOrientation != null;
         this.angle = options.getAngle();
         this.initialTorch = options.getCameraTorch();
+        this.zoom = options.getCameraZoom();
     }
 
     @Override
@@ -258,7 +261,7 @@ public class CameraCapture extends SurfaceCapture {
         return ratio.getAspectRatio();
     }
 
-    @TargetApi(AndroidVersions.API_28_ANDROID_9)
+    @TargetApi(AndroidVersions.API_30_ANDROID_11)
     @Override
     public void start(Surface surface) throws IOException {
         if (transform != null) {
@@ -288,6 +291,14 @@ public class CameraCapture extends SurfaceCapture {
                     return;
                 }
 
+                CameraManager cameraManager = ServiceManager.getCameraManager();
+                try {
+                    CameraCharacteristics characteristics = cameraManager.getCameraCharacteristics(cameraId);
+                    zoomRange = characteristics.get(CameraCharacteristics.CONTROL_ZOOM_RATIO_RANGE);
+                } catch (CameraAccessException e) {
+                    Ln.w("Could not get camera characteristics");
+                }
+
                 try {
                     requestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_RECORD);
                     requestBuilder.addTarget(captureSurface);
@@ -298,6 +309,11 @@ public class CameraCapture extends SurfaceCapture {
                     if (initialTorch) {
                         Ln.i("Turn camera torch on");
                         requestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_TORCH);
+                    }
+                    if (zoom != 1) {
+                        zoom = clampZoom(zoom);
+                        Ln.i("Set camera zoom: " + zoom);
+                        requestBuilder.set(CaptureRequest.CONTROL_ZOOM_RATIO, zoom);
                     }
 
                     CaptureRequest request = requestBuilder.build();
@@ -454,6 +470,15 @@ public class CameraCapture extends SurfaceCapture {
                 }
             }
         });
+    }
+
+    private float clampZoom(float value) {
+        assertCameraThread();
+        if (zoomRange == null) {
+            return value;
+        }
+
+        return zoomRange.clamp(value);
     }
 
     private void assertCameraThread() {
