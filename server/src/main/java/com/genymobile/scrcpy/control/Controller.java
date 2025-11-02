@@ -290,6 +290,15 @@ public class Controller implements AsyncProcessor, VirtualDisplayListener {
 
         int type = msg.getType();
 
+        // Events for all sources (display or camera)
+        switch (type) {
+            case ControlMessage.TYPE_RESET_VIDEO:
+                resetVideo();
+                return true;
+            default:
+                // fall through
+        }
+
         if (!camera) {
             switch (type) {
                 case ControlMessage.TYPE_INJECT_KEYCODE:
@@ -355,9 +364,6 @@ public class Controller implements AsyncProcessor, VirtualDisplayListener {
                     return true;
                 case ControlMessage.TYPE_START_APP:
                     startAppAsync(msg.getText());
-                    return true;
-                case ControlMessage.TYPE_RESET_VIDEO:
-                    resetVideo();
                     return true;
                 default:
                     // fall through
