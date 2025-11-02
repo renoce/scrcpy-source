@@ -211,9 +211,4 @@ public class ScreenCapture extends SurfaceCapture {
             SurfaceControl.closeTransaction();
         }
     }
-
-    @Override
-    public void requestInvalidate() {
-        invalidate();
-    }
 }

@@ -19,9 +19,9 @@ public abstract class SurfaceCapture {
     private CaptureListener listener;
 
     /**
-     * Notify the listener that the capture has been invalidated (for example, because its size changed).
+     * Notify the listener that the capture has been invalidated (for example, because its size changed, or due to a manual user request).
      */
-    protected void invalidate() {
+    public void invalidate() {
         listener.onInvalidated();
     }
 
@@ -86,11 +86,4 @@ public abstract class SurfaceCapture {
     public boolean isClosed() {
         return false;
     }
-
-    /**
-     * Manually request to invalidate (typically a user request).
-     * <p>
-     * The capture implementation is free to ignore the request and do nothing.
-     */
-    public abstract void requestInvalidate();
 }

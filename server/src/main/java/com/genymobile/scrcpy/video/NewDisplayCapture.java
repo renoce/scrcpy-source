@@ -261,9 +261,4 @@ public class NewDisplayCapture extends SurfaceCapture {
         int num = size.getMax();
         return initialDpi * num / den;
     }
-
-    @Override
-    public void requestInvalidate() {
-        invalidate();
-    }
 }
