@@ -313,6 +313,10 @@ apply_orientation_transform(struct sc_input_manager *im,
 static void
 sc_input_manager_process_text_input(struct sc_input_manager *im,
                                     const SDL_TextInputEvent *event) {
+    if (!im->kp || im->screen->paused) {
+        return;
+    }
+
     if (!im->kp->ops->process_text) {
         // The key processor does not support text input
         return;
@@ -370,6 +374,9 @@ inverse_point(struct sc_point point, struct sc_size size,
 static void
 sc_input_manager_process_key(struct sc_input_manager *im,
                              const SDL_KeyboardEvent *event) {
+    // some key events do not interact with the device, so process the event
+    // even if control is disabled
+
     // controller is NULL if --no-control is requested
     bool control = im->controller;
     bool paused = im->screen->paused;
@@ -633,6 +640,10 @@ sc_input_manager_get_position(struct sc_input_manager *im, int32_t x,
 static void
 sc_input_manager_process_mouse_motion(struct sc_input_manager *im,
                                       const SDL_MouseMotionEvent *event) {
+    if (!im->mp || im->screen->paused) {
+        return;
+    }
+
     if (event->which == SDL_TOUCH_MOUSEID) {
         // simulated from touch events, so it's a duplicate
         return;
@@ -668,6 +679,10 @@ sc_input_manager_process_mouse_motion(struct sc_input_manager *im,
 static void
 sc_input_manager_process_touch(struct sc_input_manager *im,
                                const SDL_TouchFingerEvent *event) {
+    if (!im->mp || im->screen->paused) {
+        return;
+    }
+
     if (!im->mp->ops->process_touch) {
         // The mouse processor does not support touch events
         return;
@@ -716,6 +731,9 @@ sc_input_manager_get_binding(const struct sc_mouse_binding_set *bindings,
 static void
 sc_input_manager_process_mouse_button(struct sc_input_manager *im,
                                       const SDL_MouseButtonEvent *event) {
+    // some mouse events do not interact with the device, so process the event
+    // even if control is disabled
+
     if (event->which == SDL_TOUCH_MOUSEID) {
         // simulated from touch events, so it's a duplicate
         return;
@@ -883,6 +901,10 @@ sc_input_manager_process_mouse_button(struct sc_input_manager *im,
 static void
 sc_input_manager_process_mouse_wheel(struct sc_input_manager *im,
                                      const SDL_MouseWheelEvent *event) {
+    if (!im->kp || im->screen->paused) {
+        return;
+    }
+
     if (!im->mp->ops->process_mouse_scroll) {
         // The mouse processor does not support scroll events
         return;
@@ -907,6 +929,12 @@ sc_input_manager_process_mouse_wheel(struct sc_input_manager *im,
 static void
 sc_input_manager_process_gamepad_device(struct sc_input_manager *im,
                                        const SDL_GamepadDeviceEvent *event) {
+    // Handle device added or removed even if paused
+
+    if (!im->gp) {
+        return;
+    }
+
     if (event->type == SDL_EVENT_GAMEPAD_ADDED) {
         SDL_Gamepad *sdl_gamepad = SDL_OpenGamepad(event->which);
         if (!sdl_gamepad) {
@@ -948,6 +976,10 @@ sc_input_manager_process_gamepad_device(struct sc_input_manager *im,
 static void
 sc_input_manager_process_gamepad_axis(struct sc_input_manager *im,
                                       const SDL_GamepadAxisEvent *event) {
+    if (!im->gp || im->screen->paused) {
+        return;
+    }
+
     enum sc_gamepad_axis axis = sc_gamepad_axis_from_sdl(event->axis);
     if (axis == SC_GAMEPAD_AXIS_UNKNOWN) {
         return;
@@ -964,6 +996,10 @@ sc_input_manager_process_gamepad_axis(struct sc_input_manager *im,
 static void
 sc_input_manager_process_gamepad_button(struct sc_input_manager *im,
                                        const SDL_GamepadButtonEvent *event) {
+    if (!im->gp || im->screen->paused) {
+        return;
+    }
+
     enum sc_gamepad_button button = sc_gamepad_button_from_sdl(event->button);
     if (button == SC_GAMEPAD_BUTTON_UNKNOWN) {
         return;
@@ -986,6 +1022,10 @@ is_apk(const char *file) {
 static void
 sc_input_manager_process_file(struct sc_input_manager *im,
                               const SDL_DropEvent *event) {
+    if (!im->controller) {
+        return;
+    }
+
     assert(event->type == SDL_EVENT_DROP_FILE);
     char *file = strdup(event->data);
     if (!file) {
@@ -1008,72 +1048,41 @@ sc_input_manager_process_file(struct sc_input_manager *im,
 void
 sc_input_manager_handle_event(struct sc_input_manager *im,
                               const SDL_Event *event) {
-    bool control = im->controller;
-    bool paused = im->screen->paused;
     switch (event->type) {
         case SDL_EVENT_TEXT_INPUT:
-            if (!im->kp || paused) {
-                break;
-            }
             sc_input_manager_process_text_input(im, &event->text);
             break;
         case SDL_EVENT_KEY_DOWN:
         case SDL_EVENT_KEY_UP:
-            // some key events do not interact with the device, so process the
-            // event even if control is disabled
             sc_input_manager_process_key(im, &event->key);
             break;
         case SDL_EVENT_MOUSE_MOTION:
-            if (!im->mp || paused) {
-                break;
-            }
             sc_input_manager_process_mouse_motion(im, &event->motion);
             break;
         case SDL_EVENT_MOUSE_WHEEL:
-            if (!im->mp || paused) {
-                break;
-            }
             sc_input_manager_process_mouse_wheel(im, &event->wheel);
             break;
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
         case SDL_EVENT_MOUSE_BUTTON_UP:
-            // some mouse events do not interact with the device, so process
-            // the event even if control is disabled
             sc_input_manager_process_mouse_button(im, &event->button);
             break;
         case SDL_EVENT_FINGER_MOTION:
         case SDL_EVENT_FINGER_DOWN:
         case SDL_EVENT_FINGER_UP:
-            if (!im->mp || paused) {
-                break;
-            }
             sc_input_manager_process_touch(im, &event->tfinger);
             break;
         case SDL_EVENT_GAMEPAD_ADDED:
         case SDL_EVENT_GAMEPAD_REMOVED:
-            // Handle device added or removed even if paused
-            if (!im->gp) {
-                break;
-            }
             sc_input_manager_process_gamepad_device(im, &event->gdevice);
             break;
         case SDL_EVENT_GAMEPAD_AXIS_MOTION:
-            if (!im->gp || paused) {
-                break;
-            }
             sc_input_manager_process_gamepad_axis(im, &event->gaxis);
             break;
         case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
         case SDL_EVENT_GAMEPAD_BUTTON_UP:
-            if (!im->gp || paused) {
-                break;
-            }
             sc_input_manager_process_gamepad_button(im, &event->gbutton);
             break;
         case SDL_EVENT_DROP_FILE: {
-            if (!control) {
-                break;
-            }
             sc_input_manager_process_file(im, &event->drop);
         }
     }
