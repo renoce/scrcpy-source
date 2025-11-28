@@ -1213,6 +1213,14 @@ static const struct sc_shortcut shortcuts[] = {
         .shortcuts = { "Drag & drop non-APK file" },
         .text = "Push file to device (see --push-target)",
     },
+    {
+        .shortcuts = { "MOD+t" },
+        .text = "Turn on the camera torch (camera mode only)",
+    },
+    {
+        .shortcuts = { "MOD+Shift+t" },
+        .text = "Turn off the camera torch (camera mode only)",
+    },
 };
 
 static const struct sc_envvar envvars[] = {

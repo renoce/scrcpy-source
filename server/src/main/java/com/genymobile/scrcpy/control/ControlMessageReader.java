@@ -56,6 +56,8 @@ public class ControlMessageReader {
                 return parseUhidDestroy();
             case ControlMessage.TYPE_START_APP:
                 return parseStartApp();
+            case ControlMessage.TYPE_CAMERA_SET_TORCH:
+                return parseCameraSetTorch();
             default:
                 throw new ControlProtocolException("Unknown event type: " + type);
         }
@@ -164,6 +166,11 @@ public class ControlMessageReader {
     private ControlMessage parseStartApp() throws IOException {
         String name = parseString(1);
         return ControlMessage.createStartApp(name);
+    }
+
+    private ControlMessage parseCameraSetTorch() throws IOException {
+        boolean on = dis.readBoolean();
+        return ControlMessage.createCameraSetTorch(on);
     }
 
     private Position parsePosition() throws IOException {

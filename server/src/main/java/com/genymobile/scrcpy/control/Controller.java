@@ -12,6 +12,7 @@ import com.genymobile.scrcpy.device.Position;
 import com.genymobile.scrcpy.device.Size;
 import com.genymobile.scrcpy.util.Ln;
 import com.genymobile.scrcpy.util.LogUtils;
+import com.genymobile.scrcpy.video.CameraCapture;
 import com.genymobile.scrcpy.video.SurfaceCapture;
 import com.genymobile.scrcpy.video.VideoSource;
 import com.genymobile.scrcpy.video.VirtualDisplayListener;
@@ -99,7 +100,7 @@ public class Controller implements AsyncProcessor, VirtualDisplayListener {
 
     private boolean keepDisplayPowerOff;
 
-    // Used for resetting video encoding on RESET_VIDEO message
+    // Used for resetting video encoding on RESET_VIDEO message or for sending camera controls
     private SurfaceCapture surfaceCapture;
 
     public Controller(ControlChannel controlChannel, CleanUp cleanUp, Options options) {
@@ -364,6 +365,16 @@ public class Controller implements AsyncProcessor, VirtualDisplayListener {
                     return true;
                 case ControlMessage.TYPE_START_APP:
                     startAppAsync(msg.getText());
+                    return true;
+                default:
+                    // fall through
+            }
+        } else {
+            assert surfaceCapture instanceof CameraCapture;
+            CameraCapture cameraCapture = (CameraCapture) surfaceCapture;
+            switch (type) {
+                case ControlMessage.TYPE_CAMERA_SET_TORCH:
+                    cameraCapture.setTorchEnabled(msg.getOn());
                     return true;
                 default:
                     // fall through
