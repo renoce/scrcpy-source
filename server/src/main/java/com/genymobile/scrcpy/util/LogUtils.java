@@ -164,7 +164,7 @@ public final class LogUtils {
                         // Capture frame rates for low-FPS mode are the same for every resolution
                         Range<Integer>[] lowFpsRanges = characteristics.get(CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES);
                         if (lowFpsRanges != null) {
-                            SortedSet<Integer> uniqueLowFps = getUniqueSet(lowFpsRanges);
+                            String uniqueLowFps = getFormattedUniqueSet(lowFpsRanges);
                             builder.append(", fps=").append(uniqueLowFps);
                         }
                     } catch (Exception e) {
@@ -191,7 +191,7 @@ public final class LogUtils {
                             builder.append("\n      High speed capture (--camera-high-speed):");
                             for (android.util.Size size : highSpeedSizes) {
                                 Range<Integer>[] highFpsRanges = configs.getHighSpeedVideoFpsRanges();
-                                SortedSet<Integer> uniqueHighFps = getUniqueSet(highFpsRanges);
+                                String uniqueHighFps = getFormattedUniqueSet(highFpsRanges);
                                 builder.append("\n        - ").append(size.getWidth()).append("x").append(size.getHeight());
                                 builder.append(" (fps=").append(uniqueHighFps).append(')');
                             }
@@ -205,14 +205,26 @@ public final class LogUtils {
         return builder.toString();
     }
 
-    private static SortedSet<Integer> getUniqueSet(Range<Integer>[] ranges) {
+    private static String getFormattedUniqueSet(Range<Integer>[] ranges) {
         SortedSet<Integer> set = new TreeSet<>();
         for (Range<Integer> range : ranges) {
             set.add(range.getUpper());
         }
-        return set;
-    }
 
+        StringBuilder builder = new StringBuilder("{");
+        boolean first = true;
+        for (Integer i : set) {
+            if (!first) {
+                builder.append(", ");
+            } else {
+                first = false;
+            }
+            builder.append(i);
+        }
+        builder.append("}");
+
+        return builder.toString();
+    }
 
     public static String buildAppListMessage() {
         List<DeviceApp> apps = Device.listApps();
