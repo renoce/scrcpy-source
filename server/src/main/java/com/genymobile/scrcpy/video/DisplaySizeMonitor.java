@@ -23,7 +23,7 @@ public class DisplaySizeMonitor {
 
     // On Android 14, DisplayListener may be broken (it never sends events). This is fixed in recent Android 14 upgrades, but we can't really
     // detect it directly, so register a DisplayWindowListener (introduced in Android 11) to listen to configuration changes instead.
-    private static final boolean USE_DEFAULT_METHOD = Build.VERSION.SDK_INT != AndroidVersions.API_34_ANDROID_14;
+    private static final boolean USE_DEFAULT_METHOD = Build.VERSION.SDK_INT < AndroidVersions.API_34_ANDROID_14;
 
     private DisplayManager.DisplayListenerHandle displayListenerHandle;
     private HandlerThread handlerThread;
