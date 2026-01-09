@@ -325,7 +325,8 @@ sc_screen_init(struct sc_screen *screen,
         }
     }
 
-    uint32_t window_flags = SDL_WINDOW_HIGH_PIXEL_DENSITY;
+    // Always create the window hidden to prevent blinking during initialization
+    uint32_t window_flags = SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_HIDDEN;
     if (params->always_on_top) {
         window_flags |= SDL_WINDOW_ALWAYS_ON_TOP;
     }
@@ -334,8 +335,7 @@ sc_screen_init(struct sc_screen *screen,
     }
     if (params->video) {
         // The window will be shown on first frame
-        window_flags |= SDL_WINDOW_HIDDEN
-                      | SDL_WINDOW_RESIZABLE;
+        window_flags |= SDL_WINDOW_RESIZABLE;
     }
 
     const char *title = params->window_title;
@@ -443,9 +443,14 @@ sc_screen_init(struct sc_screen *screen,
     screen->open = false;
 #endif
 
-    if (!screen->video && sc_screen_is_relative_mode(screen)) {
-        // Capture mouse immediately if video mirroring is disabled
-        sc_mouse_capture_set_active(&screen->mc, true);
+    if (!screen->video) {
+        // Show the window immediately
+        sc_sdl_show_window(screen->window);
+
+        if (sc_screen_is_relative_mode(screen)) {
+            // Capture mouse immediately if video mirroring is disabled
+            sc_mouse_capture_set_active(&screen->mc, true);
+        }
     }
 
     return true;
