@@ -389,8 +389,12 @@ sc_display_render(struct sc_display *display, const SDL_Rect *geometry,
 
     if (orientation == SC_ORIENTATION_0) {
         SDL_FRect frect;
-        SDL_RectToFRect(geometry, &frect);
-        bool ok = SDL_RenderTexture(renderer, texture, NULL, &frect);
+        SDL_FRect *fgeometry = NULL;
+        if (geometry) {
+            SDL_RectToFRect(geometry, &frect);
+            fgeometry = &frect;
+        }
+        bool ok = SDL_RenderTexture(renderer, texture, NULL, fgeometry);
         if (!ok) {
             LOGE("Could not render texture: %s", SDL_GetError());
             return SC_DISPLAY_RESULT_ERROR;
