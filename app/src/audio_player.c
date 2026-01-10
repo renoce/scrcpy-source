@@ -120,14 +120,6 @@ sc_audio_player_frame_sink_open(struct sc_frame_sink *sink,
     ap->device = SDL_GetAudioStreamDevice(ap->stream);
     assert(ap->device);
 
-    // The thread calling open() is the thread calling push(), which fills the
-    // audio buffer consumed by the SDL audio thread.
-    ok = sc_thread_set_priority(SC_THREAD_PRIORITY_TIME_CRITICAL);
-    if (!ok) {
-        ok = sc_thread_set_priority(SC_THREAD_PRIORITY_HIGH);
-        (void) ok; // We don't care if it worked, at least we tried
-    }
-
     ok = SDL_ResumeAudioDevice(ap->device);
     if (!ok) {
         LOGE("Could not resume audio device: %s", SDL_GetError());
