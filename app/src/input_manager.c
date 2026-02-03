@@ -1166,8 +1166,8 @@ sc_input_manager_handle_event(struct sc_input_manager *im,
         case SDL_EVENT_GAMEPAD_BUTTON_UP:
             sc_input_manager_process_gamepad_button(im, &event->gbutton);
             break;
-        case SDL_EVENT_DROP_FILE: {
+        case SDL_EVENT_DROP_FILE:
             sc_input_manager_process_file(im, &event->drop);
-        }
+            break;
     }
 }
