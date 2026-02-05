@@ -21,7 +21,7 @@ public final class Streamer {
 
     private final FileDescriptor fd;
     private final Codec codec;
-    private boolean sendStreamMeta;
+    private final boolean sendCodecMeta;
     private final boolean sendFrameMeta;
 
     private final ByteBuffer headerBuffer = ByteBuffer.allocate(12);
