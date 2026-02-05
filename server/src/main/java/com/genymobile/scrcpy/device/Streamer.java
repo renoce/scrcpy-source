@@ -3,6 +3,7 @@ package com.genymobile.scrcpy.device;
 import com.genymobile.scrcpy.audio.AudioCodec;
 import com.genymobile.scrcpy.util.Codec;
 import com.genymobile.scrcpy.util.IO;
+import com.genymobile.scrcpy.util.Ln;
 
 import android.media.MediaCodec;
 
@@ -30,6 +31,13 @@ public final class Streamer {
         this.codec = codec;
         this.sendStreamMeta = sendCodecMeta;
         this.sendFrameMeta = sendFrameMeta;
+    }
+
+    public Streamer(FileDescriptor fd) {
+        this.codec = null;
+        this.sendCodecMeta = false;
+        this.sendFrameMeta = false;
+        this.fd = fd;
     }
 
     public Codec getCodec() {
@@ -117,6 +125,23 @@ public final class Streamer {
         headerBuffer.putInt(packetSize);
         headerBuffer.flip();
         IO.writeFully(fd, headerBuffer);
+    }
+
+    final static int HEAD_SIZE = 4;
+    public void writeSizeInfo(SizeInfo data){
+        try {
+            String jsonData = data.toJson();
+            ByteBuffer buffer = ByteBuffer.allocate(HEAD_SIZE + jsonData.getBytes().length);
+
+            buffer.putInt(HEAD_SIZE + jsonData.getBytes().length);
+            buffer.put(jsonData.getBytes());
+
+            buffer.flip();
+            IO.writeFully(fd, buffer);
+        }catch (IOException e){
+            Ln.e("write size info err:",e);
+        }
+
     }
 
     private static void fixOpusConfigPacket(ByteBuffer buffer) throws IOException {

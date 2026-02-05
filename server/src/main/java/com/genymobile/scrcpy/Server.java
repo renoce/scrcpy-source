@@ -96,13 +96,14 @@ public final class Server {
         boolean control = options.getControl();
         boolean video = options.getVideo();
         boolean audio = options.getAudio();
+        boolean sizeInfo = options.getSizeInfo();
         boolean sendDummyByte = options.getSendDummyByte();
 
         Workarounds.apply();
 
         List<AsyncProcessor> asyncProcessors = new ArrayList<>();
 
-        DesktopConnection connection = DesktopConnection.open(scid, tunnelForward, video, audio, control, sendDummyByte);
+        DesktopConnection connection = DesktopConnection.open(scid, tunnelForward, video, audio, control, sizeInfo, sendDummyByte);
         try {
             if (options.getSendDeviceMeta()) {
                 connection.sendDeviceMeta(Device.getDeviceName());
@@ -146,7 +147,11 @@ public final class Server {
                         surfaceCapture = new NewDisplayCapture(controller, options);
                     } else {
                         assert options.getDisplayId() != Device.DISPLAY_ID_NONE;
-                        surfaceCapture = new ScreenCapture(controller, options);
+                        if (options.getSizeInfo()){
+                            surfaceCapture = new ScreenCapture(controller, options,new Streamer(connection.getSizeInfoFd()));
+                        }else {
+                            surfaceCapture = new ScreenCapture(controller, options);
+                        }
                     }
                 } else {
                     surfaceCapture = new CameraCapture(options);

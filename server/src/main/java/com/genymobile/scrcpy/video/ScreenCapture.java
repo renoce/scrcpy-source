@@ -8,6 +8,8 @@ import com.genymobile.scrcpy.device.Device;
 import com.genymobile.scrcpy.device.DisplayInfo;
 import com.genymobile.scrcpy.device.Orientation;
 import com.genymobile.scrcpy.device.Size;
+import com.genymobile.scrcpy.device.SizeInfo;
+import com.genymobile.scrcpy.device.Streamer;
 import com.genymobile.scrcpy.opengl.AffineOpenGLFilter;
 import com.genymobile.scrcpy.opengl.OpenGLFilter;
 import com.genymobile.scrcpy.opengl.OpenGLRunner;
@@ -45,6 +47,7 @@ public class ScreenCapture extends SurfaceCapture {
 
     private AffineMatrix transform;
     private OpenGLRunner glRunner;
+    private Streamer sizeInfoStreamer;
 
     public ScreenCapture(VirtualDisplayListener vdListener, Options options) {
         this.vdListener = vdListener;
@@ -57,6 +60,20 @@ public class ScreenCapture extends SurfaceCapture {
         assert captureOrientationLock != null;
         assert captureOrientation != null;
         this.angle = options.getAngle();
+    }
+
+    public ScreenCapture(VirtualDisplayListener vdListener, Options options, Streamer sizeInfoStreamer) {
+        this.vdListener = vdListener;
+        this.displayId = options.getDisplayId();
+        assert displayId != Device.DISPLAY_ID_NONE;
+        this.maxSize = options.getMaxSize();
+        this.crop = options.getCrop();
+        this.captureOrientationLock = options.getCaptureOrientationLock();
+        this.captureOrientation = options.getCaptureOrientation();
+        assert captureOrientationLock != null;
+        assert captureOrientation != null;
+        this.angle = options.getAngle();
+        this.sizeInfoStreamer = sizeInfoStreamer;
     }
 
     @Override
@@ -98,6 +115,7 @@ public class ScreenCapture extends SurfaceCapture {
 
         transform = filter.getInverseTransform();
         videoSize = filter.getOutputSize().limit(maxSize).round8();
+        this.sizeInfoStreamer.writeSizeInfo(new SizeInfo(displayInfo.getRotation(), videoSize));
     }
 
     @Override
